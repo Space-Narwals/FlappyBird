@@ -1,8 +1,9 @@
 import pygame
 import os
 import random
+import ctypes
 
-version = "1.0.0 BETA"
+version = "1.0.2 PRE-RELEASE"
 
 clock = pygame.time.Clock()
 
@@ -19,25 +20,35 @@ PIPE_WIDTH = 26
 
 BACKGROUND_WIDTH = 168
 BACKROUND_HEIGHT = 56
+
+BIRD_HEIGHT = 12
+BIRD_WIDTH = 17
 #Represents the Y cordinate of where the scrolling background begins.
 BACKGROUND_Y_START = 200
 
 spriteimage = pygame.image.load('res/sprites.png')
 
+i_icon = os.getcwd() + '\\res\\flappy_bird_icon.png'
+icon = pygame.image.load(i_icon)
+pygame.display.set_icon(icon)
+pygame.display.set_caption("Flappy Bird")
+
+myappid = 'my_otc.flappy_bird.v1_2' # icon
+ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
+
 class Pipe(pygame.sprite.Sprite):
     def __init__(self, side, y):
-
         # Call the parent class (Sprite) constructor
         pygame.sprite.Sprite.__init__(self)
 
-        pipeImage = pygame.Surface((PIPE_WIDTH, PIPE_HEIGHT))
+        pipeImage = pygame.Surface((PIPE_WIDTH, PIPE_HEIGHT), pygame.SRCALPHA, 32)
         if side == "bottom":
             pipeImage.blit(spriteimage, (0, 0), (84, 323, PIPE_WIDTH, PIPE_HEIGHT))
         else:
             pipeImage.blit(spriteimage, (0, 0), (56, 323, PIPE_WIDTH, PIPE_HEIGHT))
         pipeImage = pygame.transform.scale(pipeImage, (PIPE_WIDTH * SCALE, PIPE_HEIGHT * SCALE))
 
-        self.image = pipeImage
+        self.image = pipeImage.convert_alpha()
         self.rect = self.image.get_rect()
         #Spawn the pipes 50 pixels to the right of the
         self.rect.x = 144 * SCALE + 50
@@ -66,6 +77,51 @@ class ScrollingBackground(pygame.sprite.Sprite):
         if right == 0:
             self.rect.x = (BACKGROUND_WIDTH * SCALE)
 
+class Bird(pygame.sprite.Sprite):
+
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        firstBird = pygame.Surface((BIRD_WIDTH, BIRD_HEIGHT), pygame.SRCALPHA, 32)
+        firstBird.blit(spriteimage, (0, 0), (3, 491, BIRD_WIDTH, BIRD_HEIGHT))
+        firstBird = pygame.transform.scale(firstBird, (BIRD_WIDTH * SCALE, BIRD_HEIGHT * SCALE))
+        self.image = firstBird.convert_alpha()
+        self.rect = self.image.get_rect()
+        self.rect.x = (SCREEN_WIDTH / 4) * SCALE
+        self.rect.y = (SCREEN_HEIGHT / 2) * SCALE
+        self.ANIMATION_COUNTER = 0
+
+    def update(self):
+        self.ANIMATION_COUNTER += 1
+
+        if self.ANIMATION_COUNTER == 5:
+            firstBird = pygame.Surface((BIRD_WIDTH, BIRD_HEIGHT), pygame.SRCALPHA, 32)
+            firstBird.blit(spriteimage, (0, 0), (3, 491, BIRD_WIDTH, BIRD_HEIGHT))
+            firstBird = pygame.transform.scale(firstBird, (BIRD_WIDTH * SCALE, BIRD_HEIGHT * SCALE))
+            self.image = firstBird.convert_alpha()
+            self.rect = self.image.get_rect()
+            self.rect.x = (SCREEN_WIDTH / 4) * SCALE
+            self.rect.y = (SCREEN_HEIGHT / 2) * SCALE
+
+        if self.ANIMATION_COUNTER == 10:
+            firstBird = pygame.Surface((BIRD_WIDTH, BIRD_HEIGHT), pygame.SRCALPHA, 32)
+            firstBird.blit(spriteimage, (0, 0), (31, 491, BIRD_WIDTH, BIRD_HEIGHT))
+            firstBird = pygame.transform.scale(firstBird, (BIRD_WIDTH * SCALE, BIRD_HEIGHT * SCALE))
+            self.image = firstBird.convert_alpha()
+            self.rect = self.image.get_rect()
+            self.rect.x = (SCREEN_WIDTH / 4) * SCALE
+            self.rect.y = (SCREEN_HEIGHT / 2) * SCALE
+
+        if self.ANIMATION_COUNTER == 15:
+            firstBird = pygame.Surface((BIRD_WIDTH, BIRD_HEIGHT), pygame.SRCALPHA, 32)
+            firstBird.blit(spriteimage, (0, 0), (59, 491, BIRD_WIDTH, BIRD_HEIGHT))
+            firstBird = pygame.transform.scale(firstBird, (BIRD_WIDTH * SCALE, BIRD_HEIGHT * SCALE))
+            self.image = firstBird.convert_alpha()
+            self.rect = self.image.get_rect()
+            self.rect.x = (SCREEN_WIDTH / 4) * SCALE
+            self.rect.y = (SCREEN_HEIGHT / 2) * SCALE
+
+            self.ANIMATION_COUNTER = 0
+
 def main():
     counter = 0
     running = True
@@ -81,6 +137,8 @@ def main():
 
     pipe_list = pygame.sprite.Group()
     background_list = pygame.sprite.Group()
+    bird_list = pygame.sprite.Group()
+
 
     #Start one background at 0, start another right at the end of the other one.
     #The X of the right point is BACKGROUND_WIDTH * SCALE
@@ -89,6 +147,9 @@ def main():
     background_list.add(bg1)
     background_list.add(bg2)
 
+
+    bird = Bird();
+    bird_list.add(bird)
     while running:
         clock.tick(60)
 
@@ -108,12 +169,14 @@ def main():
 
         screen.blit(backgroundcrop, backgroundcrop.get_rect())
         pipe_list.draw(screen)
-
+        bird_list.draw(screen)
         background_list.draw(screen)
         pygame.display.flip()
 
         background_list.update()
         pipe_list.update()
+        bird_list.update()
+
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
