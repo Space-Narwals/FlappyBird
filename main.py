@@ -89,9 +89,14 @@ class Bird(pygame.sprite.Sprite):
         self.rect.x = (SCREEN_WIDTH / 4) * SCALE
         self.rect.y = (SCREEN_HEIGHT / 2) * SCALE
         self.ANIMATION_COUNTER = 0
+        self.vy = 0
+        self.y = 0
 
     def update(self):
         self.ANIMATION_COUNTER += 1
+        self.y += self.vy;
+        self.vy += 0.5;
+        self.rect.y = self.y
 
         if self.ANIMATION_COUNTER == 5:
             firstBird = pygame.Surface((BIRD_WIDTH, BIRD_HEIGHT), pygame.SRCALPHA, 32)
@@ -100,7 +105,7 @@ class Bird(pygame.sprite.Sprite):
             self.image = firstBird.convert_alpha()
             self.rect = self.image.get_rect()
             self.rect.x = (SCREEN_WIDTH / 4) * SCALE
-            self.rect.y = (SCREEN_HEIGHT / 2) * SCALE
+            self.rect.y = self.y
 
         if self.ANIMATION_COUNTER == 10:
             firstBird = pygame.Surface((BIRD_WIDTH, BIRD_HEIGHT), pygame.SRCALPHA, 32)
@@ -109,7 +114,7 @@ class Bird(pygame.sprite.Sprite):
             self.image = firstBird.convert_alpha()
             self.rect = self.image.get_rect()
             self.rect.x = (SCREEN_WIDTH / 4) * SCALE
-            self.rect.y = (SCREEN_HEIGHT / 2) * SCALE
+            self.rect.y = self.y
 
         if self.ANIMATION_COUNTER == 15:
             firstBird = pygame.Surface((BIRD_WIDTH, BIRD_HEIGHT), pygame.SRCALPHA, 32)
@@ -118,9 +123,11 @@ class Bird(pygame.sprite.Sprite):
             self.image = firstBird.convert_alpha()
             self.rect = self.image.get_rect()
             self.rect.x = (SCREEN_WIDTH / 4) * SCALE
-            self.rect.y = (SCREEN_HEIGHT / 2) * SCALE
+            self.rect.y = self.y
 
             self.ANIMATION_COUNTER = 0
+
+
 
 def main():
     counter = 0
@@ -177,11 +184,14 @@ def main():
         pipe_list.update()
         bird_list.update()
 
-
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
                 print(event)
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    print "space"
+                    bird.vy = -8;
 
 
 if __name__ == "__main__": main()
