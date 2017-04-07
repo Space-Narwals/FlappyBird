@@ -2,6 +2,7 @@ import pygame
 import os
 import random
 import ctypes
+import sys
 
 version = "1.0.2 PRE-RELEASE"
 
@@ -23,6 +24,8 @@ BACKROUND_HEIGHT = 56
 
 BIRD_HEIGHT = 12
 BIRD_WIDTH = 17
+
+SCORE = 0
 #Represents the Y cordinate of where the scrolling background begins.
 BACKGROUND_Y_START = 200
 
@@ -53,12 +56,21 @@ class Pipe(pygame.sprite.Sprite):
         #Spawn the pipes 50 pixels to the right of the
         self.rect.x = 144 * SCALE + 50
         self.rect.y = y
+        self.counted = False
+        self.side = side
 
     def update(self):
         self.rect.x = self.rect.x - 3
         #If the sprite goes off the screen, destroy it.
         if (self.rect.x < 0 - (PIPE_WIDTH * SCALE)):
             self.kill()
+
+        if self.rect.x < (SCREEN_WIDTH / 4) * SCALE:
+
+            if self.counted == False and self.side == "bottom":
+                global SCORE
+                SCORE += 1
+                self.counted = True
 
 class ScrollingBackground(pygame.sprite.Sprite):
     def __init__(self, startX):
@@ -132,6 +144,8 @@ class Bird(pygame.sprite.Sprite):
 def main():
     counter = 0
     running = True
+    endGame = False
+
     print "Starting version", version
     pygame.init()
     os.environ['SDL_VIDEO_CENTERED'] = '1'
@@ -146,7 +160,6 @@ def main():
     background_list = pygame.sprite.Group()
     bird_list = pygame.sprite.Group()
 
-
     #Start one background at 0, start another right at the end of the other one.
     #The X of the right point is BACKGROUND_WIDTH * SCALE
     bg1 = ScrollingBackground(0)
@@ -154,44 +167,71 @@ def main():
     background_list.add(bg1)
     background_list.add(bg2)
 
-
     bird = Bird();
     bird_list.add(bird)
     while running:
         clock.tick(60)
+        if not endGame:
+            print "GAME IS RUNNING"
+            counter = counter + 1
 
-        counter = counter + 1
+            if counter == TICKS_TO_SPAWN:
+                counter = 0
+                #Generate a random number between 5 and 140.
+                #Adjust for SCALE
+                #Subtract the length of the pipe so so we get the "Top" pipe.
+                start = random.randint(5 * SCALE, 140 * SCALE) - (PIPE_HEIGHT * SCALE)
+                topPipe = Pipe("top", start)
+                #Add at least 50 pixels of clearence for the player to navigate through.
+                bottomPipe = Pipe("bottom", start + (PIPE_HEIGHT * SCALE) + (50 * SCALE))
+                pipe_list.add(topPipe)
+                pipe_list.add(bottomPipe)
 
-        if counter == TICKS_TO_SPAWN:
-            counter = 0
-            #Generate a random number between 5 and 140.
-            #Adjust for SCALE
-            #Subtract the length of the pipe so so we get the "Top" pipe.
-            start = random.randint(5 * SCALE, 140 * SCALE) - (PIPE_HEIGHT * SCALE)
-            topPipe = Pipe("top", start)
-            #Add at least 50 pixels of clearence for the player to navigate through.
-            bottomPipe = Pipe("bottom", start + (PIPE_HEIGHT * SCALE) + (50 * SCALE))
-            pipe_list.add(topPipe)
-            pipe_list.add(bottomPipe)
+            screen.blit(backgroundcrop, backgroundcrop.get_rect())
+            pipe_list.draw(screen)
+            bird_list.draw(screen)
+            background_list.draw(screen)
 
-        screen.blit(backgroundcrop, backgroundcrop.get_rect())
-        pipe_list.draw(screen)
-        bird_list.draw(screen)
-        background_list.draw(screen)
-        pygame.display.flip()
+            flappyFont = pygame.font.Font("res/font.ttf", 20)
 
-        background_list.update()
-        pipe_list.update()
-        bird_list.update()
+            global SCORE
+            label = flappyFont.render(str(SCORE), 1, (255, 255, 255))
+            screen.blit(label, ((SCREEN_WIDTH / 2) * SCALE, 5 * SCALE))
+
+            pygame.display.flip()
+
+            background_list.update()
+            pipe_list.update()
+            bird_list.update()
+
+            if bird.rect.y > 195 * SCALE:
+                endGame = True
+                endFont = pygame.font.Font("res/font.ttf", 30)
+                gameOver = endFont.render("GAME OVER", 1, (255, 255, 255))
+                screen.blit(gameOver, (0, 0))
+
+                gameOver = endFont.render("Score: " + str(SCORE), 1, (255, 255, 255))
+                screen.blit(gameOver, (0, 100))
+
+                gameOver = endFont.render("Press Space to play again", 1, (255, 255, 255))
+                screen.blit(gameOver, (0, 150))
+                pygame.display.flip()
 
         for event in pygame.event.get():
+            print(event)
             if event.type == pygame.QUIT:
                 running = False
                 print(event)
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
                     print "space"
-                    bird.vy = -8;
+                    if endGame == True:
+                        main()
+                        global SCORE
+                        SCORE = 0
+                        break
+                    else:
+                        bird.vy = -8;
 
 
 if __name__ == "__main__": main()
