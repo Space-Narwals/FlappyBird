@@ -221,7 +221,9 @@ def main():
             print(event)
             if event.type == pygame.QUIT:
                 running = False
+		endGame = True
                 print(event)
+		sys.exit()
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
                     print "space"
