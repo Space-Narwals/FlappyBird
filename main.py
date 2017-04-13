@@ -146,6 +146,9 @@ def main():
     running = True
     endGame = False
 
+    global SCORE
+    SCORE = 0
+
     print "Starting version", version
     pygame.init()
     os.environ['SDL_VIDEO_CENTERED'] = '1'
@@ -200,11 +203,7 @@ def main():
 
             pygame.display.flip()
 
-            background_list.update()
-            pipe_list.update()
-            bird_list.update()
-
-            if bird.rect.y > 195 * SCALE:
+            if pygame.sprite.groupcollide(pipe_list, bird_list, False, False):
                 endGame = True
                 endFont = pygame.font.Font("res/font.ttf", 30)
                 gameOver = endFont.render("GAME OVER", 1, (255, 255, 255))
@@ -217,20 +216,39 @@ def main():
                 screen.blit(gameOver, (0, 150))
                 pygame.display.flip()
 
+
+            background_list.update()
+            pipe_list.update()
+            bird_list.update()
+            if bird.rect.y > 195 * SCALE:
+                endGame = True
+                endFont = pygame.font.Font("res/font.ttf", 30)
+
+                gameOver = endFont.render("GAME OVER", 1, (255, 255, 255))
+                drawXGameOver =  ((SCREEN_WIDTH / 2) + (gameOver.get_rect().width / 2))
+                screen.blit(gameOver, (drawXGameOver, 50 * SCALE))
+
+                scoreText = endFont.render("Score: " + str(SCORE), 1, (255, 255, 255))
+                drawXScore =  ((SCREEN_WIDTH / 2) + (scoreText.get_rect().width / 2))
+                screen.blit(scoreText, (drawXScore, 75 * SCALE))
+
+                playAgain = endFont.render("Press Space to play again", 1, (255, 255, 255))
+                drawXAgain =  ((SCREEN_WIDTH / 2) + (playAgain.get_rect().width / 2))
+                screen.blit(playAgain, (drawXAgain, 100 * SCALE))
+                pygame.display.flip()
+
         for event in pygame.event.get():
             print(event)
             if event.type == pygame.QUIT:
                 running = False
-		endGame = True
+                endGame = True
                 print(event)
-		sys.exit()
+                sys.exit()
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
                     print "space"
                     if endGame == True:
                         main()
-                        global SCORE
-                        SCORE = 0
                         break
                     else:
                         bird.vy = -8;
