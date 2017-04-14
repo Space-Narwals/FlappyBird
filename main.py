@@ -255,7 +255,7 @@ def main():
                         main()
                         break
                     else:
-                        bird.vy = -8;
+                        bird.vy = -3 * SCALE;
 
 
 if __name__ == "__main__": main()
