@@ -14,7 +14,7 @@ SCREEN_HEIGHT = 256
 SCALE = 3
 
 #How many ticks should we wait before spawnning another pair of pipes?
-TICKS_TO_SPAWN = 120
+TICKS_TO_SPAWN = 100
 
 PIPE_HEIGHT = 159
 PIPE_WIDTH = 26
@@ -205,15 +205,18 @@ def main():
 
             if pygame.sprite.groupcollide(pipe_list, bird_list, False, False):
                 endGame = True
-                endFont = pygame.font.Font("res/font.ttf", 30)
-                gameOver = endFont.render("GAME OVER", 1, (255, 255, 255))
-                screen.blit(gameOver, (0, 0))
+                endFont = pygame.font.Font("res/font.ttf", 10 * SCALE)
+                text = endFont.render("GAME OVER", 1, (255, 255, 255))
+                drawX = ((SCREEN_WIDTH / 2) * SCALE - (text.get_rect().width / 2))
+                screen.blit(text, (drawX, 75 * SCALE))
 
-                gameOver = endFont.render("Score: " + str(SCORE), 1, (255, 255, 255))
-                screen.blit(gameOver, (0, 100))
+                text = endFont.render("SCORE: " + str(SCORE), 1, (255, 255, 255))
+                drawX = ((SCREEN_WIDTH / 2) * SCALE - (text.get_rect().width / 2))
+                screen.blit(text, (drawX, 100 * SCALE))
 
-                gameOver = endFont.render("Press Space to play again", 1, (255, 255, 255))
-                screen.blit(gameOver, (0, 150))
+                text = endFont.render("Press space to play again!", 1, (255, 255, 255))
+                drawX = ((SCREEN_WIDTH / 2) * SCALE - (text.get_rect().width / 2))
+                screen.blit(text, (drawX, 120 * SCALE))
                 pygame.display.flip()
 
 
@@ -222,19 +225,20 @@ def main():
             bird_list.update()
             if bird.rect.y > 195 * SCALE:
                 endGame = True
-                endFont = pygame.font.Font("res/font.ttf", 30)
+                endFont = pygame.font.Font("res/font.ttf", 10 * SCALE)
 
-                gameOver = endFont.render("GAME OVER", 1, (255, 255, 255))
-                drawXGameOver =  ((SCREEN_WIDTH / 2) + (gameOver.get_rect().width / 2))
-                screen.blit(gameOver, (drawXGameOver, 50 * SCALE))
+                text = endFont.render("GAME OVER", 1, (255, 255, 255))
+                drawX = ((SCREEN_WIDTH / 2) * SCALE - (text.get_rect().width / 2))
+                screen.blit(text, (drawX, 75 * SCALE))
 
-                scoreText = endFont.render("Score: " + str(SCORE), 1, (255, 255, 255))
-                drawXScore =  ((SCREEN_WIDTH / 2) + (scoreText.get_rect().width / 2))
-                screen.blit(scoreText, (drawXScore, 75 * SCALE))
+                text = endFont.render("SCORE: " + str(SCORE), 1, (255, 255, 255))
+                drawX = ((SCREEN_WIDTH / 2) * SCALE - (text.get_rect().width / 2))
+                screen.blit(text, (drawX, 100 * SCALE))
 
-                playAgain = endFont.render("Press Space to play again", 1, (255, 255, 255))
-                drawXAgain =  ((SCREEN_WIDTH / 2) + (playAgain.get_rect().width / 2))
-                screen.blit(playAgain, (drawXAgain, 100 * SCALE))
+                text = endFont.render("Press space to play again!", 1, (255, 255, 255))
+                drawX = ((SCREEN_WIDTH / 2) * SCALE - (text.get_rect().width / 2))
+                screen.blit(text, (drawX, 120 * SCALE))
+
                 pygame.display.flip()
 
         for event in pygame.event.get():
