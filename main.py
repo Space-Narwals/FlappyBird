@@ -25,7 +25,7 @@ BACKROUND_HEIGHT = 56
 BIRD_HEIGHT = 12
 BIRD_WIDTH = 17
 
-SCORE = 0
+if __name__ == "__main__": SCORE = 0
 #Represents the Y cordinate of where the scrolling background begins.
 BACKGROUND_Y_START = 200
 
